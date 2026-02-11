@@ -10,7 +10,7 @@ def _run_query(query, model=None, fetch_all=True, apply_active_filter=True):
         return result.all() if fetch_all else result.first()
 
 
-def create_observation(observation: Observation):
+def save(observation: Observation):
     #Ensures session closes even if an exception occurs
     with Session(engine) as session: 
         session.add(observation)

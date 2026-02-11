@@ -1,6 +1,7 @@
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from route.observation import router as observation_router
+from route.employee import router as employee_router
 from exceptions.handlers import observation_not_found,observation_status_error, observation_create_error
 from exceptions.observation_exceptions import ObservationClosedError, ObservationNotFoundError, ObservationNotCreated
 from sqlmodel import SQLModel
@@ -18,6 +19,12 @@ app.include_router(
     observation_router,
     prefix="/api/observations",
     tags=["Observations"]
+)
+
+app.include_router(
+    employee_router,
+    prefix="/api",
+    tags=["Employee"]
 )
 
 app.add_exception_handler(ObservationNotFoundError, observation_not_found)

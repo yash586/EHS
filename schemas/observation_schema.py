@@ -1,6 +1,4 @@
 from pydantic import BaseModel, Field, field_validator
-from typing import Union
-from enum import Enum
 from datetime import datetime
 
 class ObservationBase(BaseModel):
@@ -19,3 +17,10 @@ class ObservationBase(BaseModel):
 class ObservationResponse(ObservationBase):
     public_id:str
     createdAt:datetime
+
+class ObservationUpdate(BaseModel):
+    title : str | None = None
+    category_id: int | None = None
+    employee_id: int | None = None
+    location : str | None = None
+    date: datetime | None = None

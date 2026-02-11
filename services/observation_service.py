@@ -1,16 +1,9 @@
 from repository import observation_repository
-from schemas.observation_schema import ObservationBase, ObservationResponse
+from schemas.observation_schema import ObservationBase, ObservationResponse, ObservationUpdate
 from models.observation_model import Observation
 from datetime import datetime
 from exceptions.observation_exceptions import ObservationNotCreated, ObservationNotFoundError
 
-# def get_by_id(observation_id:int):
-#     observation = observation_repository.find_by_id(observation_id=observation_id)
-
-#     if not observation:
-#         return {"message": "Not Found"}
-    
-#     return observation
 def getRecords(observation_id:str):
     obs = observation_repository.getObservation(observation_id=observation_id)
     if not obs:
@@ -25,7 +18,7 @@ def new_observation(payload: ObservationBase):
         location=payload.location,
         date= payload.date
     )
-    observation = observation_repository.create_observation(obs)
+    observation = observation_repository.save(obs)
 
     if not observation:
         raise ObservationNotCreated("Observation not created")
@@ -39,29 +32,25 @@ def list_observation(employee_id: int | None = None, category_id: int | None = N
         return observation_repository.get_by_category(category_id)
     return observation_repository.findAll()
 
+def update_observation(observation_id:str, payload:ObservationUpdate):
+    observation = observation_repository.getObservation(observation_id=observation_id)
 
-# def update(observation_id:int, payload:ObservationUpdate):
-#     observation = observation_repository.find_by_id(observation_id=observation_id)
+    if not observation:
+        raise ObservationNotFoundError("Observation Not found")
     
-#     if not observation:
-#         raise ObservationNotFoundError("Observation not found")
-    
-#     if observation.get("status") == ObservationStatus.closed:
-#         raise ObservationClosedError("Cannot update a closed observation")
-    
-#     changes = payload.model_dump(exclude_unset=True)
-#     updated = observation_repository.update_observation(observation_id, changes)
-#     return updated
+    changes = payload.model_dump(exclude_unset=True)
+    for key, value in changes.items():
+        setattr(observation, key, value)
+    return observation_repository.save(observation)
 
-# def delete(observation_id:int):
-#     observation = observation_repository.find_by_id(observation_id=observation_id)
-#     if not observation:
-#         raise ObservationNotFoundError("Observation not found")
-#     result = observation_repository.delete(observation_id=observation_id)
-#     return result
+def delete_observation(observation_id:str):
+    observation = observation_repository.getObservation(observation_id=observation_id)
+    
+    if not observation:
+        raise ObservationNotFoundError("Observation Not found")
+    if observation.active == False:
+        return observation
 
-# def getBySeverity(severity:Severity):
-#     observation = observation_repository.find_by_severity(severity.value)
-#     if not observation:
-#         raise ObservationNotFoundError("Observation not found")
-#     return observation
+    observation.active = False
+    obs = observation_repository.save(observation)
+    return {"observation_id":obs.public_id, "message": "Deleted Successfully"}
