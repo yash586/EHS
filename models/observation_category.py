@@ -11,6 +11,6 @@ class Category(SQLModel, table=True):
                     unique=True)
     categoryName: str
     categoryBackGround: str|None
-    active:int
+    active: bool = Field(default=True)
     createdAt: datetime = Field(default_factory=datetime.now)
     updatedAt: datetime = Field(default_factory=datetime.now)

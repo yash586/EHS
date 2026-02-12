@@ -14,3 +14,9 @@ def createEmployee(employee: Employee):
         session.commit()
         session.refresh(employee)
         return employee
+
+def getByID(employee_id: str):
+    query = select(Employee).where(Employee.public_id == employee_id)
+    with Session(engine) as session:
+        result = session.exec(query).first()
+        return result
